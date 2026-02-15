@@ -30,19 +30,18 @@ def draw_markers(markers):
         quivers_uvw = (([], [], []), ([], [], []), ([], [], []))
 
         for m_id, content in markers.items():
-            pos = content.get("position", {})
-            rot = content.get("rotation", {})
-            xyz = list(pos.values())
+            pos = content.get("position")
+            rot = content.get("rotation")
             
             if content.get("origin"):
-                ax.scatter(*xyz, c='red', marker='o')
+                ax.scatter(*pos, c='red', marker='o')
 
             for i in range(3):
-                quivers_xyz[i].append(xyz[i])
+                quivers_xyz[i].append(pos[i])
 
-            ax.text(*xyz, m_id, size=8)
+            ax.text(*pos, m_id, size=8)
             
-            rot_matrix = transform.Rotation.from_rotvec(list(rot.values())).as_matrix()
+            rot_matrix = transform.Rotation.from_rotvec(rot).as_matrix()
 
             for i in range(3):
                 for j in range(3):
