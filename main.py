@@ -33,6 +33,9 @@ def draw_markers(markers):
             pos = content.get("position", {})
             rot = content.get("rotation", {})
             xyz = list(pos.values())
+            
+            if content.get("origin"):
+                ax.scatter(*xyz, c='red', marker='o')
 
             for i in range(3):
                 quivers_xyz[i].append(xyz[i])
