@@ -16,9 +16,11 @@ ax = fig.add_subplot(111, projection='3d')
 
 data_queue = queue.Queue()
 
+scalar = 1
+
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
-    markers = data.get("markers", {})
+    markers = data.get("markers", [])
 
     data_queue.put(markers)
 
@@ -29,7 +31,7 @@ def draw_markers(markers):
         quivers_xyz = ([], [], [])
         quivers_uvw = (([], [], []), ([], [], []), ([], [], []))
 
-        for m_id, content in markers.items():
+        for content in markers:
             pos = content.get("position")
             rot = content.get("rotation")
             
@@ -39,7 +41,7 @@ def draw_markers(markers):
             for i in range(3):
                 quivers_xyz[i].append(pos[i])
 
-            ax.text(*pos, m_id, size=8)
+            ax.text(*pos, content['id'], size=8)
             
             rot_matrix = transform.Rotation.from_rotvec(rot).as_matrix()
 
@@ -48,7 +50,7 @@ def draw_markers(markers):
                     quivers_uvw[i][j].append(rot_matrix[:, i][j])
 
 
-        axis_length = 0.04
+        axis_length = 0.04 * scalar
         linewidth = 1
 
         for i, color in enumerate(('blue', 'green', 'red')):
@@ -62,7 +64,7 @@ def draw_markers(markers):
         ax.set_zlabel('Z Axis')
         ax.set_title("Real-time MQTT Marker Positions")
 
-        bound = 0.15
+        bound = 0.15 * scalar
         ax.set_ybound(-bound, bound)
         ax.set_xbound(-bound, bound)
         ax.set_zbound(-bound, bound)
